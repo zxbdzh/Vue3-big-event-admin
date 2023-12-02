@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# npm test
+C:/Users/没有名字的名字/AppData/Roaming/npm/pnpm.cmd lint
