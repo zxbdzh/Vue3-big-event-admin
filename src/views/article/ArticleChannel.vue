@@ -4,6 +4,7 @@ import { artGetChannelsService, artDelChannelService } from '@/api/article'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import ChannelEdit from './components/ChannelEdit.vue'
 import { ElMessage } from 'element-plus'
+
 const channelList = ref([])
 const loading = ref(false)
 const dialog = ref()
@@ -27,7 +28,7 @@ const onDelChannel = async (row) => {
   })
   await artDelChannelService(row.id)
   ElMessage.success('删除成功')
-  getChannelList()
+  await getChannelList()
 }
 const onAddChannel = () => {
   dialog.value.open({})
@@ -43,7 +44,7 @@ const onSuccess = () => {
       <el-button @click="onAddChannel">添加分类</el-button>
     </template>
     <el-table v-loading="loading" :data="channelList" style="width: 100%">
-      <el-table-column label="序号" width="100" type="index"> </el-table-column>
+      <el-table-column label="序号" width="100" type="index"></el-table-column>
       <el-table-column label="分类名称" prop="cate_name"></el-table-column>
       <el-table-column label="分类别名" prop="cate_alias"></el-table-column>
       <el-table-column label="操作" width="100">

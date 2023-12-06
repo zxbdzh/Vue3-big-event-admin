@@ -1,6 +1,7 @@
 <script setup>
 import { Delete, Edit } from '@element-plus/icons-vue'
 import { ref } from 'vue'
+import ChannelSelect from '@/views/article/components/ChannelSelect.vue'
 // 假数据
 const articleList = ref([
   {
@@ -18,6 +19,12 @@ const articleList = ref([
     cate_name: '体育'
   }
 ])
+const params = ref({
+  pagenum: 1,
+  pagesize: 5,
+  cate_id: '',
+  state: ''
+})
 
 // 编辑逻辑
 const onEditArticle = (row) => {
@@ -39,14 +46,10 @@ const onDeleteArticle = (row) => {
     <!-- 表单区域 -->
     <el-form inline>
       <el-form-item label="文章分类:">
-        <!-- label 是展示给用户看的, value是提交给后台的 -->
-        <el-select>
-          <el-option label="新闻" value="110"></el-option>
-          <el-option label="体育" value="137"></el-option>
-        </el-select>
+        <channel-select v-model="params.cate_id"></channel-select>
       </el-form-item>
       <el-form-item label="发布状态:">
-        <el-select>
+        <el-select v-model="params.state">
           <el-option label="已发布" value="已发布"></el-option>
           <el-option label="草稿" value="草稿"></el-option>
         </el-select>
