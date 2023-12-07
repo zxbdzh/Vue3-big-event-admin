@@ -26,3 +26,6 @@ export const artGetDetailService = (id) =>
   request.get('/my/article/info', {
     params: { id }
   })
+
+// 文章：编辑文章接口
+export const artEditService = (data) => request.put('/my/article/info', data)

@@ -4,7 +4,13 @@ import ChannelSelect from '@/views/article/components/ChannelSelect.vue'
 import { Plus } from '@element-plus/icons-vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import { artPublishService } from '@/api/article'
+import {
+  artEditService,
+  artGetDetailService,
+  artPublishService
+} from '@/api/article'
+import { baseURL } from '@/utils/request'
+import axios from 'axios'
 
 // 控制抽屉显示隐藏
 const visibleDrawer = ref(false)
@@ -46,7 +52,10 @@ const onPublish = async (state) => {
   // 发送请求
   if (formModel.value.id) {
     // 编辑操作
-    console.log('编辑操作')
+    await artEditService(fd)
+    ElMessage.success('修改成功')
+    visibleDrawer.value = false
+    emit('success', 'edit')
   } else {
     console.log(formModel.value.cover_img)
     // 添加操作
@@ -61,12 +70,41 @@ const onPublish = async (state) => {
 // 编辑器Ref
 const editorRef = ref()
 
-const open = (row) => {
+// 将网络图片地址转换为File对象
+async function imageUrlToFile(url, fileName) {
+  try {
+    // 第一步：使用axios获取网络图片数据
+    const response = await axios.get(url, { responseType: 'arraybuffer' })
+    const imageData = response.data
+
+    // 第二步：将图片数据转换为Blob对象
+    const blob = new Blob([imageData], {
+      type: response.headers['content-type']
+    })
+
+    // 第三步：创建一个新的File对象
+    return new File([blob], fileName, { type: blob.type })
+  } catch (error) {
+    console.error('将图片转换为File对象时发生错误:', error)
+    throw error
+  }
+}
+
+const open = async (row) => {
   visibleDrawer.value = true // 显示抽屉
 
   if (row.id) {
     // 需要基于 row.id 发送请求，获取编辑对应的详情数据，进行回显
-    console.log('编辑回显')
+    const res = await artGetDetailService(row.id)
+    formModel.value = res.data.data
+    // 图片需要单独回显
+    imgUrl.value = baseURL + formModel.value.cover_img
+    // 注意：提交给后台，需要的数据格式，是file对象格式
+    // 需要将网络图片地址 => 转换成 file 对象，存储起来,将来便于提交
+    formModel.value.cover_img = await imageUrlToFile(
+      imgUrl.value,
+      formModel.value.cover_img
+    )
   } else {
     formModel.value = { ...defaultForm } // 基于默认的数据，重置form对象
     // 这里重置了表单的数据，但是图片上传的img地址和富文本编辑器的内容 => 需要手动重置
